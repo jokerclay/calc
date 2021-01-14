@@ -15,16 +15,14 @@ class Calc : public QMainWindow
 
 public:
 
-    // Declare a constructor and by passing 0 we state this widget
-    // has no parent
+    // widget 没有 parent
     explicit Calc(QWidget *parent = 0);
     ~Calc();
 
 private:
     Ui::Calc *ui;
 
-    // These slots are executed when a signal is
-    // submitted (Ex. Number button is clicked)
+    // 当信号被提交时，槽会被执行
 private slots :
     void NumPressed();
     void MathButtonPressed();

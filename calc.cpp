@@ -26,22 +26,23 @@ Calc::Calc(QWidget *parent) :
     // 将 0.0  设为默认值 显示
     ui->Display->setText(QString::number(calcVal));
 
-    // Will hold references to all the number buttons
+    // 创建 10 个按键数字
     QPushButton *numButtons[10];
 
-    // Cycle through locating the buttons
+    // 循环定位按钮
     for(int i = 0; i < 10; ++i){
+        // 按键0-按键9 button0~button9
         QString butName = "Button" + QString::number(i);
 
-        // Get the buttons by name and add to array
+        // 根据名字获取特定的 widget 并添加到数组
         numButtons[i] = Calc::findChild<QPushButton *>(butName);
 
-        // When the button is released call num_pressed()
+        // 当按钮松开，调用数字被按下 函数
         connect(numButtons[i], SIGNAL(released()), this,
                 SLOT(NumPressed()));
     }
 
-    // Connect signals and slots for math buttons
+    // 将 release 信号与 槽函数 连接起来
     connect(ui->Add, SIGNAL(released()), this,
             SLOT(MathButtonPressed()));
     connect(ui->Subtract, SIGNAL(released()), this,
@@ -51,17 +52,17 @@ Calc::Calc(QWidget *parent) :
     connect(ui->Divide, SIGNAL(released()), this,
             SLOT(MathButtonPressed()));
 
-    // Connect equals button
+    // 连接等于键
     connect(ui->Equals, SIGNAL(released()), this,
             SLOT(EqualButtonPressed()));
 
-    // Connect change sign
+    // 连接改变符号键
     connect(ui->ChangeSign, SIGNAL(released()), this,
             SLOT(ChangeNumberSign()));
 
 
 }
-
+// ======================当数字键被按下========================
 Calc::~Calc()
 {
     delete ui;
@@ -69,52 +70,46 @@ Calc::~Calc()
 
 void Calc::NumPressed(){
 
-    // Sender returns a pointer to the button pressed
     QPushButton *button = (QPushButton *)sender();
 
-    // Get number on button
+    // 获取按键UI 上的值
     QString butVal = button->text();
 
-    // Get the value in the display
+    // 获取展示框中的值
     QString displayVal = ui->Display->text();
-
+    // 如果展示框内是 0 或 0.0 , 就把按键的值显示出来
     if((displayVal.toDouble() == 0) || (displayVal.toDouble() == 0.0)){
 
-        // calcVal = butVal.toDouble();
         ui->Display->setText(butVal);
 
     } else {
-        // Put the new number to the right of whats there
+        // 将新数放右边
         QString newVal = displayVal + butVal;
 
-        // Double version of number
+        // 数的 Double 型
         double dblNewVal = newVal.toDouble();
 
-        // calcVal = newVal.toDouble();
-
-        // Set value in display and allow up to 16
-        // digits before using exponents
+        // 最多显示16 个数字
         ui->Display->setText(QString::number(dblNewVal, 'g', 16));
 
     }
 }
-
+// ======================当运算符被按下========================
 void Calc::MathButtonPressed(){
 
-    // Cancel out previous math button clicks
     divTrigger = false;
     multTrigger = false;
     addTrigger = false;
     subTrigger = false;
 
-    // Store current value in Display
+    // 获取存储在展示中当前的值
     QString displayVal = ui->Display->text();
     calcVal = displayVal.toDouble();
 
-    // Sender returns a pointer to the button pressed
+
     QPushButton *button = (QPushButton *)sender();
 
-    // Get math symbol on the button
+    // 从按键上获取运算符
     QString butVal = button->text();
 
     if(QString::compare(butVal, "/", Qt::CaseInsensitive) == 0){
@@ -127,21 +122,22 @@ void Calc::MathButtonPressed(){
         subTrigger = true;
     }
 
-    // Clear display
+    // 清空展示框
     ui->Display->setText("");
 
 }
 
+// ======================当等于号被按下========================
 void Calc::EqualButtonPressed(){
 
-    // Holds new calculation
+    // 将值恢复为0.0
     double solution = 0.0;
 
-    // Get value in display
+    // 获取展示框里的值
     QString displayVal = ui->Display->text();
     double dblDisplayVal = displayVal.toDouble();
 
-    // Make sure a math button was pressed
+    // 确认运算符按键被按下
     if(addTrigger || subTrigger || multTrigger || divTrigger ){
         if(addTrigger){
             solution = calcVal + dblDisplayVal;
@@ -154,26 +150,27 @@ void Calc::EqualButtonPressed(){
         }
     }
 
-    // Put solution in display
+    // 展示结果
     ui->Display->setText(QString::number(solution));
 
 }
 
+// ======================改变符号函数==========================
 void Calc::ChangeNumberSign(){
 
-    // Get the value in the display
+    // 获取展示框里的值
     QString displayVal = ui->Display->text();
 
-    // Regular expression checks if it is a number
-    // plus sign
+    // 正则表达式检查是否是一个数
+    // 添加符号
     QRegExp reg("[-+]?[0-9.]*");
 
-    // If it is a number change the sign
+    // 如果是一个数字，改变他的符号
     if(reg.exactMatch(displayVal)){
         double dblDisplayVal = displayVal.toDouble();
         double dblDisplayValSign = -1 * dblDisplayVal;
 
-        // Put solution in display
+        // 将结果展示出来
         ui->Display->setText(QString::number(dblDisplayValSign));
     }
 
